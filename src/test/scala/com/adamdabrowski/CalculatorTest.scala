@@ -3,12 +3,12 @@ package com.adamdabrowski
 
 import org.scalacheck.Gen
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.prop.TableFor2
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.EitherValues
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 
-class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyChecks:
+class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyChecks with EitherValues:
 
   "Calculator" when:
     import com.adamdabrowski.Calculator.calculate
@@ -17,39 +17,39 @@ class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyCh
 
       "sum numbers" in:
         forAll: (a: Double, b: Double) =>
-          calculate(s"$a $b +") shouldBe (a + b)
+          calculate(s"$a $b +").value shouldBe (a + b)
 
       "subtract numbers" in:
         forAll: (a: Double, b: Double) =>
-          calculate(s"$a $b -") shouldBe (a - b)
+          calculate(s"$a $b -").value shouldBe (a - b)
 
       "multiply numbers" in:
         forAll: (a: Double, b: Double) =>
-          calculate(s"$a $b *") shouldBe (a * b)
+          calculate(s"$a $b *").value shouldBe (a * b)
 
       "divide numbers" in:
         forAll: (a: Double, b: Double) =>
-          calculate(s"$a $b /") shouldBe (a / b)
+          calculate(s"$a $b /").value shouldBe (a / b)
 
-      "take an absolute value o.0 a number" in:
+      "take an absolute value of a number" in:
         forAll: (a: Double) =>
-          calculate(s"$a abs") shouldBe scala.math.abs(a)
+          calculate(s"$a abs").value shouldBe scala.math.abs(a)
 
-      ".0ind largest number" in:
+      "find largest number" in:
         val number  = Gen.chooseNum(Double.MinValue, Double.MaxValue)
         val numbers = Gen.nonEmptyListOf(number)
 
         forAll(numbers): (xs: List[Double]) =>
-          calculate(s"${xs.mkString(" ")} max") shouldBe xs.max
+          calculate(s"${xs.mkString(" ")} max").value shouldBe xs.max
 
       "handle real numbers" in:
-        calculate("0.5 2 *") shouldBe 1
+        calculate("0.5 2 *").value shouldBe 1.0
 
       "handle negative numbers" in:
-        calculate("-1 2 *") shouldBe -2
+        calculate("-1 2 *").value shouldBe -2.0
 
       "handle multiple operations" in:
-        val inputs: TableFor2[String, Double] =
+        val inputs =
           Table(
             ("input",                      "expected result"),
             ("1 1 + 1 +",                  3.0),
@@ -58,10 +58,10 @@ class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyCh
           )
 
         forAll(inputs): (input: String, expected: Double) =>
-          calculate(input) shouldBe expected
+          calculate(input).value shouldBe expected
 
       "handle combined unary, binary and n-ary operations" in:
-        val inputs: TableFor2[String, Double] =
+        val inputs =
           Table(
             ("input",                  "expected result"),
             ("1 2 - abs",              1.0),
