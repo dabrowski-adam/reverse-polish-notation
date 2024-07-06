@@ -12,8 +12,7 @@ type Operation = Stack => Stack
 
 enum Operators(val name: String, val operation: Operation):
 
-  def apply(stack: Stack): Stack =
-    operation(stack)
+  def apply(stack: Stack): Stack = operation(stack)
 
   case Add      extends Operators("+", binaryOperation(_ + _))
   case Subtract extends Operators("-", binaryOperation(_ - _))
