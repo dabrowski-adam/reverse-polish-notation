@@ -16,30 +16,30 @@ class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyCh
     "input is valid" should:
 
       "sum numbers" in:
-        forAll: (a: Float, b: Float) =>
+        forAll: (a: Double, b: Double) =>
           calculate(s"$a $b +") shouldBe (a + b)
 
       "subtract numbers" in:
-        forAll: (a: Float, b: Float) =>
+        forAll: (a: Double, b: Double) =>
           calculate(s"$a $b -") shouldBe (a - b)
 
       "multiply numbers" in:
-        forAll: (a: Float, b: Float) =>
+        forAll: (a: Double, b: Double) =>
           calculate(s"$a $b *") shouldBe (a * b)
 
       "divide numbers" in:
-        forAll: (a: Float, b: Float) =>
+        forAll: (a: Double, b: Double) =>
           calculate(s"$a $b /") shouldBe (a / b)
 
-      "take an absolute value of a number" in:
-        forAll: (a: Float) =>
+      "take an absolute value o.0 a number" in:
+        forAll: (a: Double) =>
           calculate(s"$a abs") shouldBe scala.math.abs(a)
 
-      "find largest number" in:
-        val number  = Gen.chooseNum(Float.MinValue, Float.MaxValue)
+      ".0ind largest number" in:
+        val number  = Gen.chooseNum(Double.MinValue, Double.MaxValue)
         val numbers = Gen.nonEmptyListOf(number)
 
-        forAll(numbers): (xs: List[Float]) =>
+        forAll(numbers): (xs: List[Double]) =>
           calculate(s"${xs.mkString(" ")} max") shouldBe xs.max
 
       "handle real numbers" in:
@@ -49,27 +49,28 @@ class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyCh
         calculate("-1 2 *") shouldBe -2
 
       "handle multiple operations" in:
-        val inputs: TableFor2[String, Float] =
+        val inputs: TableFor2[String, Double] =
           Table(
             ("input",                      "expected result"),
-            ("1 1 + 1 +",                  3f),
-            ("12 2 3 4 * 10 5 / + * +",    40f),
-            ("2 7 + 3 / 14 3 - 4 * + 2 /", 23.5f),
+            ("1 1 + 1 +",                  3.0),
+            ("12 2 3 4 * 10 5 / + * +",    40.0),
+            ("2 7 + 3 / 14 3 - 4 * + 2 /", 23.5),
           )
 
-        forAll(inputs): (input: String, expected: Float) =>
+        forAll(inputs): (input: String, expected: Double) =>
           calculate(input) shouldBe expected
 
       "handle combined unary, binary and n-ary operations" in:
-        val inputs: TableFor2[String, Float] =
+        val inputs: TableFor2[String, Double] =
           Table(
             ("input",                  "expected result"),
-            ("1 2 - abs",              1f),
-            ("1 1 + 1 max",            2f),
-            ("1 1 - 1 - abs 0 -1 max", 1f),
+            ("1 2 - abs",              1.0),
+            ("1 1 + 1 max",            2.0),
+            ("1 1 - 1 - abs 0 -1 max", 1.0),
           )
 
-        forAll(inputs): (input: String, expected: Float) =>
+        forAll(inputs): (input: String, expected: Double) =>
           calculate(input) shouldBe expected
 
+  
 end CalculatorTest

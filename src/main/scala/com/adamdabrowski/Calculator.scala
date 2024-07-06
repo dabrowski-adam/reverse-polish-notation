@@ -5,16 +5,16 @@ import scala.annotation.tailrec
 
 object Calculator:
 
-  private type Element = Operators | Float
+  private type Element = Operators | Double
 
-  def calculate(input: String): Float =
+  def calculate(input: String): Double =
     evaluateRPN(parse(input))
 
   @tailrec
-  private def evaluateRPN(remaining: List[Element], stack: Stack = List.empty): Float =
+  private def evaluateRPN(remaining: List[Element], stack: Stack = List.empty): Double =
     (remaining, stack) match
       case (Nil, result :: Nil)                   => result
-      case ((operand: Float) :: tail, stack)      => evaluateRPN(tail, operand :: stack)
+      case ((operand: Double) :: tail, stack)      => evaluateRPN(tail, operand :: stack)
       case ((operator: Operators) :: tail, stack) => evaluateRPN(tail, operator(stack))
       case (Nil, _)                               =>
         throw MatchError(
@@ -26,4 +26,4 @@ object Calculator:
     words.map(parseWord)
 
   private def parseWord(word: String): Element =
-    Operators.parse(word).getOrElse(word.toFloat)
+    Operators.parse(word).getOrElse(word.toDouble)

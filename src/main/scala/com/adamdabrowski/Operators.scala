@@ -6,7 +6,7 @@ import scala.math.abs
 import cats.syntax.all.*
 
 
-type Stack     = List[Float]
+type Stack     = List[Double]
 type Operation = Stack => Stack
 
 
@@ -34,11 +34,11 @@ private def maximum: Operation =
   case _                    => throw IllegalArgumentException("Operation requires at least one operand.")
 
 
-private def binaryOperation(operation: (Float, Float) => Float): Operation =
+private def binaryOperation(operation: (Double, Double) => Double): Operation =
   case a :: b :: tail => operation(b, a) :: tail
   case _              => throw IllegalArgumentException("Operation requires two operands.")
 
 
-private def unaryOperation(operation: Float => Float): Operation =
+private def unaryOperation(operation: Double => Double): Operation =
   case x :: tail => operation(x) :: tail
   case _         => throw IllegalArgumentException("Operation requires an operand.")
