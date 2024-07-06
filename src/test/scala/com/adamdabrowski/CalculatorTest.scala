@@ -70,7 +70,42 @@ class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyCh
           )
 
         forAll(inputs): (input: String, expected: Double) =>
-          calculate(input) shouldBe expected
+          calculate(input).value shouldBe expected
 
-  
+      "handle whitespace" in:
+        val whitespace  = Gen.oneOf(' ', '\t')
+        val validInputs =
+          for
+            left    <- Gen.stringOf(whitespace)
+            operand  = 42
+            middle  <- Gen.nonEmptyStringOf(whitespace)
+            operator = "abs"
+            right   <- Gen.stringOf(whitespace)
+          yield s"$left$operand$middle$operator$right"
+
+        forAll(validInputs): (input: String) =>
+          calculate(input).value shouldBe 42.0
+
+    "input is invalid" should:
+
+      "fail when input is empty" in:
+        calculate("").left.value shouldBe "Input cannot be empty."
+
+      "fail for unknown operators" in:
+        calculate("1 1 unknown").left.value shouldBe "Input contains invalid elements."
+
+      "fail when there are not enough operands for a binary operator" in:
+        val invalidInputs: Gen[String] =
+          for
+            maybeOperand <- Gen.option(Gen.double)
+            operator     <- Gen.oneOf(List("+", "-", "*", "/"))
+            input         = maybeOperand.map(operand => s"$operand $operator").getOrElse(operator)
+          yield input
+
+        forAll(invalidInputs): input =>
+          calculate(input).left.value shouldBe "Operation requires two operands."
+
+      "fail when there are not enough operands for an unary operator" in:
+        calculate("abs").left.value shouldBe "Operation requires an operand."
+
 end CalculatorTest
