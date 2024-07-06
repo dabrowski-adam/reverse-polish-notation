@@ -11,6 +11,19 @@ object Calculator:
 
   private type Element = Operators | Double
 
+  /** @param input Description of mathematical operations in Reverse Polish Notation, e.g. `"5 1 + 7 *"`, which equals 42.
+    *              Operands can be any real numbers.
+    *
+    *              Available operations:
+    *              - `+` – summation
+    *              - `-` – subtraction
+    *              - `*` – multiplication
+    *              - `/` – division
+    *              - `abs` – absolute value
+    *              - `max` – maximum
+    *
+    * @return The result of calculation or a parsing error.
+    */
   def calculate(input: String): Either[String, Double] =
     for
       elements <- parse(input)
@@ -37,3 +50,5 @@ object Calculator:
 
   private def parseWord(word: String): Option[Element] =
     Operators.parse(word).orElse(word.toDoubleOption)
+
+end Calculator
