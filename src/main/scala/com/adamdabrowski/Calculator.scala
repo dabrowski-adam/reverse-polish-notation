@@ -31,7 +31,7 @@ object Calculator:
   private def parse(input: String): Either[String, List[Element]] =
     for
       nonEmptyInput <- Option(input).filter(_.nonEmpty).toRight("Input cannot be empty.")
-      words          = nonEmptyInput.split("\\s+").toList
+      words          = nonEmptyInput.trim.split("\\s+").toList
       parsed        <- words.traverse(parseWord).toRight("Input contains invalid elements.")
     yield parsed
 
