@@ -21,6 +21,7 @@ object Calculator:
     *              - `/` – division
     *              - `abs` – absolute value
     *              - `max` – maximum
+    *              - `sqrt` – square root
     *
     * @return The result of calculation or a parsing error.
     */

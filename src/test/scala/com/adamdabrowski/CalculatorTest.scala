@@ -1,6 +1,8 @@
 package com.adamdabrowski
 
 
+import scala.math.{abs, sqrt}
+
 import org.scalacheck.Gen
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -33,7 +35,7 @@ class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyCh
 
       "take an absolute value of a number" in:
         forAll: (a: Double) =>
-          calculate(s"$a abs").value shouldBe scala.math.abs(a)
+          calculate(s"$a abs").value shouldBe abs(a)
 
       "find largest number" in:
         val number  = Gen.chooseNum(Double.MinValue, Double.MaxValue)
@@ -41,6 +43,11 @@ class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyCh
 
         forAll(numbers): (xs: List[Double]) =>
           calculate(s"${xs.mkString(" ")} max").value shouldBe xs.max
+
+      "take the square root of a number" in:
+        forAll: (a: Double) =>
+          whenever(a > .0):
+            calculate(s"$a sqrt").value shouldEqual sqrt(a)
 
       "handle real numbers" in:
         calculate("0.5 2 *").value shouldBe 1.0

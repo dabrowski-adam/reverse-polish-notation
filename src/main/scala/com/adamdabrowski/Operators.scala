@@ -1,7 +1,7 @@
 package com.adamdabrowski
 
 
-import scala.math.abs
+import scala.math.{abs, sqrt}
 
 import cats.syntax.all.*
 
@@ -20,6 +20,7 @@ enum Operators(val name: String, val operation: Operation):
   case Divide   extends Operators("/", binaryOperation(_ / _))
   case Abs      extends Operators("abs", unaryOperation(abs))
   case Max      extends Operators("max", maximum)
+  case Sqrt     extends Operators("sqrt", unaryOperation(sqrt))
 
 
 object Operators:
