@@ -1,6 +1,7 @@
 package com.adamdabrowski
 
 
+import org.scalacheck.Gen
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableFor2
 import org.scalatest.wordspec.AnyWordSpec
@@ -30,6 +31,17 @@ class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyCh
         forAll: (a: Float, b: Float) =>
           calculate(s"$a $b /") shouldBe (a / b)
 
+      "take an absolute value of a number" in:
+        forAll: (a: Float) =>
+          calculate(s"$a abs") shouldBe scala.math.abs(a)
+
+      "find largest number" in:
+        val number  = Gen.chooseNum(Float.MinValue, Float.MaxValue)
+        val numbers = Gen.nonEmptyListOf(number)
+
+        forAll(numbers): (xs: List[Float]) =>
+          calculate(s"${xs.mkString(" ")} max") shouldBe xs.max
+
       "handle real numbers" in:
         calculate("0.5 2 *") shouldBe 1
 
@@ -43,6 +55,18 @@ class CalculatorTest extends AnyWordSpec with Matchers with ScalaCheckPropertyCh
             ("1 1 + 1 +",                  3f),
             ("12 2 3 4 * 10 5 / + * +",    40f),
             ("2 7 + 3 / 14 3 - 4 * + 2 /", 23.5f),
+          )
+
+        forAll(inputs): (input: String, expected: Float) =>
+          calculate(input) shouldBe expected
+
+      "handle combined unary, binary and n-ary operations" in:
+        val inputs: TableFor2[String, Float] =
+          Table(
+            ("input",                  "expected result"),
+            ("1 2 - abs",              1f),
+            ("1 1 + 1 max",            2f),
+            ("1 1 - 1 - abs 0 -1 max", 1f),
           )
 
         forAll(inputs): (input: String, expected: Float) =>
