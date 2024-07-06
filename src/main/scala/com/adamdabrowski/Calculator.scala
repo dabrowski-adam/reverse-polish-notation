@@ -1,30 +1,29 @@
 package com.adamdabrowski
 
-
 import scala.annotation.tailrec
-
-import com.adamdabrowski.Operators.*
 
 
 object Calculator:
 
-  def calculate(input: String): Float =
-    calculateTailrec(parse(input))
+  private type Element = Operators | Float
 
-  private def parse(input: String): List[Operators] =
-    input.split(" ").toList.map(parseOperator)
+  def calculate(input: String): Float =
+    evaluateRPN(parse(input))
 
   @tailrec
-  private def calculateTailrec(
-    remaining: List[Operators],
-    stack:     List[Float] = List.empty,
-  ): Float =
-    if remaining.isEmpty then stack.head
-    else
-      remaining.head match
-        case Number(n) => calculateTailrec(remaining.tail, n :: stack)
-        case operation =>
-          val first  = stack.head
-          val second = stack.tail.head
-          val result = Operators.calculate(second, first, operation)
-          calculateTailrec(remaining.tail, result :: stack.tail.tail)
+  private def evaluateRPN(remaining: List[Element], stack: Stack = List.empty): Float =
+    (remaining, stack) match
+      case (Nil, result :: Nil)                   => result
+      case ((operand: Float) :: tail, stack)      => evaluateRPN(tail, operand :: stack)
+      case ((operator: Operators) :: tail, stack) => evaluateRPN(tail, operator(stack))
+      case (Nil, _)                               =>
+        throw MatchError(
+          "Stack contains multiple numbers but there are no operations left to perform.",
+        )
+
+  private def parse(input: String): List[Element] =
+    val words = input.split("\\s+").toList
+    words.map(parseWord)
+
+  private def parseWord(word: String): Element =
+    Operators.parse(word).getOrElse(word.toFloat)

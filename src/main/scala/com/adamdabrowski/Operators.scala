@@ -1,29 +1,44 @@
 package com.adamdabrowski
 
 
-enum Operators:
+import scala.math.abs
 
-  case Number(n: Float) extends Operators
-  case Add              extends Operators
-  case Subtract         extends Operators
-  case Multiply         extends Operators
-  case Divide           extends Operators
+import cats.syntax.all.*
+
+
+type Stack     = List[Float]
+type Operation = Stack => Stack
+
+
+enum Operators(val name: String, val operation: Operation):
+
+  def apply(stack: Stack): Stack =
+    operation(stack)
+
+  case Add      extends Operators("+", binaryOperation(_ + _))
+  case Subtract extends Operators("-", binaryOperation(_ - _))
+  case Multiply extends Operators("*", binaryOperation(_ * _))
+  case Divide   extends Operators("/", binaryOperation(_ / _))
+  case Abs      extends Operators("abs", unaryOperation(abs))
+  case Max      extends Operators("max", maximum)
 
 
 object Operators:
 
-  def calculate(a: Float, b: Float, operation: Operators): Float =
-    operation match
-      case Add      => a + b
-      case Subtract => a - b
-      case Multiply => a * b
-      case Divide   => a / b
-      case _        => throw new MatchError("Unsupported operation.")
+  def parse(name: String): Option[Operators] =
+    Operators.values.find(_.name.equalsIgnoreCase(name))
 
-  def parseOperator(element: String): Operators =
-    element match
-      case "+" => Operators.Add
-      case "-" => Operators.Subtract
-      case "*" => Operators.Multiply
-      case "/" => Operators.Divide
-      case n   => Operators.Number(n.toFloat)
+
+private def maximum: Operation =
+  case stack @ head :: tail => stack.max :: Nil
+  case _                    => throw IllegalArgumentException("Operation requires at least one operand.")
+
+
+private def binaryOperation(operation: (Float, Float) => Float): Operation =
+  case a :: b :: tail => operation(b, a) :: tail
+  case _              => throw IllegalArgumentException("Operation requires two operands.")
+
+
+private def unaryOperation(operation: Float => Float): Operation =
+  case x :: tail => operation(x) :: tail
+  case _         => throw IllegalArgumentException("Operation requires an operand.")
